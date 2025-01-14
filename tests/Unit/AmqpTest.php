@@ -224,4 +224,28 @@ class AmqpTest extends BaseTest
             $message
         ));
     }
+
+    public function testCount()
+    {
+        $mockedFacade = new Amqp;
+        $queue = 'test_amqp_facade_count';
+
+        $this->properties = array_merge(
+            $this->properties,
+            [
+                'queue' => $queue,
+                'bindings' => [
+                    [
+                        'queue'    => $queue,
+                        'routing'  => 'example.route.count',
+                    ],
+                ],
+            ]
+        );
+        $this->createQueue($this->properties);
+        $this->assertEquals(['messages' => 0, 'consumers' => 0], $mockedFacade->count($queue));
+
+        $mockedFacade->publish('example.route.count', 'message');
+        $this->assertEquals(['messages' => 1, 'consumers' => 0], $mockedFacade->count($queue));
+    }
 }

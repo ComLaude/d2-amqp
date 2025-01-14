@@ -160,4 +160,22 @@ class Amqp
         );
         return $response;
     }
+
+    /**
+     * Returns a count of messages, consumers on the queue
+     *
+     * @param string $queue
+     * @param array $properties
+     */
+    public function count(string $queue, array $properties = [])
+    {
+        $count = AmqpFactory::createTemporary(array_merge($properties, [
+            'queue' => $queue,
+            'queue_passive' => true,
+        ]))->declareQueue()->getQueue();
+        return [
+            'messages' => $count[1],
+            'consumers' => $count[2],
+        ];
+    }
 }
